@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="br.com.antoniomonteiro.checkdetector.ui.main.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/goToCheckDetector"
+            app:destination="@id/checkDetectorFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/checkDetectorFragment"
+        android:name="br.com.antoniomonteiro.checkdetector.ui.checkdetector.CheckDetectorFragment"
+        android:label="fragment_check_detector"
+        tools:layout="@layout/fragment_check_detector" />
+</navigation>
