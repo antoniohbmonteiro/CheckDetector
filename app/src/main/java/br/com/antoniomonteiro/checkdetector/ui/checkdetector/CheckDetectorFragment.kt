@@ -15,6 +15,7 @@ import br.com.antoniomonteiro.checkdetector.databinding.FragmentCheckDetectorBin
 import com.google.android.odml.image.MediaMlImageBuilder
 import com.google.android.odml.image.MlImage
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
@@ -73,21 +74,24 @@ import java.util.concurrent.Executors
             val imageAnalyzer = ImageAnalysis.Builder()
                 .build()
                 .also {
-                    it.setAnalyzer(cameraExecutor, CheckAnalyser {mlImage ->
+                    it.setAnalyzer(cameraExecutor, CheckAnalyser {mlImage, finishCallback ->
+
+
                         objectDetector?.let { objectDetect ->
+//                            Log.i("Antonio", "Success")
                             objectDetect.process(mlImage)
                                 .addOnSuccessListener {detectedObjects ->
-                                    Log.i("Antonio", "Success")
-
-                                    detectedObjects.firstOrNull()?.let { detectedObject ->
-                                        detectedObject.labels.firstOrNull()?.let { label ->
-                                            Log.i("AntonioLabel", label.text)
+                                    for (detectedObject in detectedObjects) {
+                                        for (label in detectedObject.labels) {
+                                            val text = label.text
+                                            Log.i("AntonioLabel", text)
                                         }
                                     }
-
+                                    finishCallback()
                                 }
                                 .addOnFailureListener {
                                     Log.i("Antonio", "Failure")
+                                    finishCallback()
                                 }
                         }
                     })
@@ -126,17 +130,21 @@ import java.util.concurrent.Executors
 
 
     @ExperimentalGetImage
-    private class CheckAnalyser(val checkAnalyserCallback: (MlImage) -> Unit): ImageAnalysis.Analyzer {
+    private class CheckAnalyser(val checkAnalyserCallback: (MlImage, ()-> Unit) -> Unit): ImageAnalysis.Analyzer {
         override fun analyze(image: ImageProxy) {
+            val inputImage = InputImage.fromMediaImage(image.image!!, image.imageInfo.rotationDegrees)
             val mlImage =
-                MediaMlImageBuilder(image.image!!).setRotation(image.imageInfo.rotationDegrees).build()
+                MediaMlImageBuilder(inputImage.mediaImage!!).setRotation(inputImage.rotationDegrees).build()
 
-            Log.i("Antonio","foi?")
+//            Log.i("Antonio","foi?")
 
-            checkAnalyserCallback(mlImage)
+            checkAnalyserCallback(mlImage){
+                image.close()
+            }
 
-            image.close() // quando finalizar o processo
+//            image.close() // quando finalizar o processo
         }
+
 
     }
 
