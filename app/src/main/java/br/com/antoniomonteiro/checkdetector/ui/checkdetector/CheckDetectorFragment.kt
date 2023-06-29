@@ -13,12 +13,15 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import br.com.antoniomonteiro.checkdetector.R
 import br.com.antoniomonteiro.checkdetector.databinding.FragmentCheckDetectorBinding
+import com.google.common.util.concurrent.ListenableFuture
 
 class CheckDetectorFragment : Fragment() {
 
     private lateinit var viewModel: CheckDetectorViewModel
 
     private lateinit var binding: FragmentCheckDetectorBinding
+
+    private lateinit var cameraProviderFuture : ListenableFuture<ProcessCameraProvider>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +39,13 @@ class CheckDetectorFragment : Fragment() {
     }
 
     private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+        bindCameraPreview()
+        bindCameraAnalysis()
+
+    }
+
+    private fun bindCameraPreview() {
+         cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         cameraProviderFuture.addListener({
             // Used to bind the lifecycle of cameras to the lifecycle owner
@@ -65,6 +74,10 @@ class CheckDetectorFragment : Fragment() {
             }
 
         }, ContextCompat.getMainExecutor(requireContext()))
+    }
+
+    private fun bindCameraAnalysis() {
+
     }
 
 
